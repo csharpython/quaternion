@@ -47,7 +47,7 @@ namespace qtnion{
 	double norm(const quaternion target){return sqrt(pow(target.one,2)+pow(target.i,2)+pow(target.j,2)+pow(target.k,2));}
 	quaternion inverse(const quaternion target){
 		quaternion buf=qtnion::conjugate(target);
-		const double TARGET_NORM=qtnion::norm(target);
+		const double TARGET_NORM=pow(qtnion::norm(target),2);
 		buf.one/=TARGET_NORM;
 		buf.i/=TARGET_NORM;
 		buf.j/=TARGET_NORM;

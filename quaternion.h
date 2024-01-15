@@ -1,10 +1,11 @@
 #include <cmath>
 namespace qtnion{
+    template <typename TYPE>
 	struct quaternion {
-		double one;
-		double i;
-		double j;
-		double k;
+		TYPE one;
+		TYPE i;
+		TYPE j;
+		TYPE k;
 		quaternion() {
 			one = 0;
 			i = 0;
@@ -37,17 +38,20 @@ namespace qtnion{
 			return ret;
 		}
 	};
-	quaternion conjugate(const quaternion target){
-		quaternion buf;
+	template <typename TYPE>
+	quaternion<TYPE> conjugate(const quaternion<TYPE> target){
+		quaternion<TYPE> buf;
 		buf.i*=-1;
 		buf.j*=-1;
 		buf.k*=-1;
 		return buf;
 	}
-	double norm(const quaternion target){return sqrt(pow(target.one,2)+pow(target.i,2)+pow(target.j,2)+pow(target.k,2));}
-	quaternion inverse(const quaternion target){
-		quaternion buf=qtnion::conjugate(target);
-		const double TARGET_NORM=pow(qtnion::norm(target),2);
+	template <typename TYPE>
+	TYPE norm(const quaternion<TYPE> target){return sqrt(pow(target.one,2)+pow(target.i,2)+pow(target.j,2)+pow(target.k,2));}
+	template <typename TYPE>
+	quaternion<TYPE> inverse(const quaternion<TYPE> target){
+		quaternion<TYPE> buf=qtnion::conjugate(target);
+		const TYPE TARGET_NORM=pow(qtnion::norm(target),2);
 		buf.one/=TARGET_NORM;
 		buf.i/=TARGET_NORM;
 		buf.j/=TARGET_NORM;

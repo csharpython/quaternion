@@ -6,12 +6,7 @@ namespace qtnion{
 		TYPE i;
 		TYPE j;
 		TYPE k;
-		quaternion() {
-			one = 0;
-			i = 0;
-			j = 0;
-			k = 0;
-		}
+		quaternion() { one = i = j = k = 0; }
 		//Copy constructor omitted
 		quaternion operator+(const quaternion& other) {
 			quaternion ret;
@@ -40,7 +35,7 @@ namespace qtnion{
 	};
 	template <typename TYPE>
 	quaternion<TYPE> conjugate(const quaternion<TYPE> target){
-		quaternion<TYPE> buf;
+		quaternion<TYPE> buf=target;
 		buf.i*=-1;
 		buf.j*=-1;
 		buf.k*=-1;
@@ -49,9 +44,11 @@ namespace qtnion{
 	template <typename TYPE>
 	TYPE norm(const quaternion<TYPE> target){return sqrt(pow(target.one,2)+pow(target.i,2)+pow(target.j,2)+pow(target.k,2));}
 	template <typename TYPE>
+	TYPE squ_norm(const quaternion<TYPE> target){return pow(target.one,2)+pow(target.i,2)+pow(target.j,2)+pow(target.k,2);}
+	template <typename TYPE>
 	quaternion<TYPE> inverse(const quaternion<TYPE> target){
-		quaternion<TYPE> buf=qtnion::conjugate(target);
-		const TYPE TARGET_NORM=pow(qtnion::norm(target),2);
+		quaternion<TYPE> buf=conjugate(target);
+		const TYPE TARGET_NORM=squ_norm(target);
 		buf.one/=TARGET_NORM;
 		buf.i/=TARGET_NORM;
 		buf.j/=TARGET_NORM;

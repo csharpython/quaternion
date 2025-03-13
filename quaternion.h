@@ -1,58 +1,106 @@
+/**
+ * @file quaternion.h
+ * @brief 四元数がらみのライブラリ
+ * @author csharpython
+ * @version v0.0.0
+ */
+#pragma once
 #include <cmath>
 namespace qtnion{
-    template <typename TYPE>
+	template <typename T>
 	struct quaternion {
-		TYPE one;
-		TYPE i;
-		TYPE j;
-		TYPE k;
+		T one;
+		T i;
+		T j;
+		T k;
+		/** 
+		 * @brief 四元数を表す構造体。
+		 */
 		quaternion() { one = i = j = k = 0; }
-		//Copy constructor omitted
-		quaternion operator+(const quaternion& other) {
+		quaternion(T one_,T i_ , T j_,T k_) {
+			one = one_;
+			i=i_;
+			j=j_;
+			k=k_;
+		}
+		/**
+		 * @brief 四元数に対する通常の加算
+		 * @param rhs 加数
+		 */
+		quaternion operator+(const quaternion& rhs) const {
 			quaternion ret;
-			ret.one = one + other.one;
-			ret.i = i + other.i;
-			ret.j = j + other.j;
-			ret.k = k + other.k;
+			ret.one = one + rhs.one;
+			ret.i = i + rhs.i;
+			ret.j = j + rhs.j;
+			ret.k = k + rhs.k;
 			return ret;
 		}
-		quaternion operator-(const quaternion& other) {
+		/**
+		 * @brief 四元数に対する通常の減算
+		 * @param rhs 減数
+		 */
+		quaternion operator-(const quaternion& rhs) const {
 			quaternion ret;
-			ret.one = one - other.one;
-			ret.i = i - other.i;
-			ret.j = j - other.j;
-			ret.k = k - other.k;
+			ret.one = one - rhs.one;
+			ret.i = i - rhs.i;
+			ret.j = j - rhs.j;
+			ret.k = k - rhs.k;
 			return ret;
 		}
-		quaternion operator*(const quaternion& other){
+		/**
+		 * @brief 四元数に対する通常の乗算
+		 * @remarks 非可換です。つまり、左辺と右辺を入れ替えると結果が変わ(ることがあ)ります。
+		 * @param rhs 乗数
+		 */
+		quaternion operator*(const quaternion& rhs) const {
 			quaternion ret;
-			ret.one = one * other.one - i * other.i - j * other.j - k*other.k;
-			ret.i = one * other.i + i * other.one + j * other.k - k * other.j;
-			ret.j = one * other.j - i * other.k + j * other.one + k * other.i;
-			ret.k = one * other.k + i * other.j - j * other.i - k * other.one;
+			ret.one = one * rhs.one - i * rhs.i - j * rhs.j - k*rhs.k;
+			ret.i = one * rhs.i + i * rhs.one + j * rhs.k - k * rhs.j;
+			ret.j = one * rhs.j - i * rhs.k + j * rhs.one + k * rhs.i;
+			ret.k = one * rhs.k + i * rhs.j - j * rhs.i + k * rhs.one;
 			return ret;
 		}
 	};
-	template <typename TYPE>
-	quaternion<TYPE> conjugate(const quaternion<TYPE> target){
-		quaternion<TYPE> buf=target;
-		buf.i*=-1;
-		buf.j*=-1;
-		buf.k*=-1;
+	/**
+	 * @brief 四元数に対する共役
+	* @return 四元数の共役
+	*/
+	template <typename T>
+	quaternion<T> conjugate(quaternion<T> val) {
+		quaternion<T> ret;
+		ret.one=val.one;
+		ret.i=-val.i;
+		ret.j=-val.j;
+		ret.k=-val.k;
+		return ret;
+	}
+	/**
+	 * @brief 四元数に対するノルムの二乗を計算
+	 * @return 引数のノルムの二乗
+	 */
+	template <typename T>
+	
+	T squ_norm(quaternion<T> val) {return val.one*val.one+val.i*val.i+val.j*val.j+val.k*val.k;}
+	/**
+	 * @brief 四元数の逆数を計算
+	 * @return 引数の逆数
+	 */
+	template <typename T>
+	quaternion<T> inverse(quaternion<T> val) {
+		quaternion<T> buf=conjugate(val);
+		const T ARG_NORM=squ_norm(val);
+		buf.one/=ARG_NORM;
+		buf.i/=ARG_NORM;
+		buf.j/=ARG_NORM;
+		buf.k/=ARG_NORM;
 		return buf;
 	}
-	template <typename TYPE>
-	TYPE norm(const quaternion<TYPE> target){return sqrt(pow(target.one,2)+pow(target.i,2)+pow(target.j,2)+pow(target.k,2));}
-	template <typename TYPE>
-	TYPE squ_norm(const quaternion<TYPE> target){return pow(target.one,2)+pow(target.i,2)+pow(target.j,2)+pow(target.k,2);}
-	template <typename TYPE>
-	quaternion<TYPE> inverse(const quaternion<TYPE> target){
-		quaternion<TYPE> buf=conjugate(target);
-		const TYPE TARGET_NORM=squ_norm(target);
-		buf.one/=TARGET_NORM;
-		buf.i/=TARGET_NORM;
-		buf.j/=TARGET_NORM;
-		buf.k/=TARGET_NORM;
-		return buf;
-	}
+	/**
+	 * @brief 四元数に対するノルムを計算
+	 * @return 自身のノルム
+	 * @remark 二乗を求めたい場合、squ_normの方がよいと思われます。
+	 * @see squ_norm()
+	 */
+	template <typename T>
+	T norm(const quaternion<T> arg){return sqrt(arg.squ_norm());}
 }

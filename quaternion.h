@@ -60,6 +60,18 @@ namespace qtnion{
 			ret.k = one * rhs.k + i * rhs.j - j * rhs.i + k * rhs.one;
 			return ret;
 		}
+		/**
+		 * @brief 四元数の実数による除算
+		 * @param rhs 除数
+		 */
+		quaternion operator/(const T rhs) const {
+			quaternion ret;
+			ret.one = one/rhs;
+			ret.i = i/rhs;
+			ret.j = j/rhs;
+			ret.k = k/rhs;
+			return ret;
+		}
 	};
 	/**
 	 * @brief 四元数に対する共役
@@ -86,15 +98,7 @@ namespace qtnion{
 	 * @return 引数の逆数
 	 */
 	template <typename T>
-	quaternion<T> inverse(quaternion<T> val) {
-		quaternion<T> buf=conjugate(val);
-		const T ARG_NORM=squ_norm(val);
-		buf.one/=ARG_NORM;
-		buf.i/=ARG_NORM;
-		buf.j/=ARG_NORM;
-		buf.k/=ARG_NORM;
-		return buf;
-	}
+	quaternion<T> inverse(quaternion<T> val) {return conjugate(val)/squ_norm(val);}
 	/**
 	 * @brief 四元数に対するノルムを計算
 	 * @return 自身のノルム
@@ -102,5 +106,11 @@ namespace qtnion{
 	 * @see squ_norm()
 	 */
 	template <typename T>
-	T norm(const quaternion<T> arg){return sqrt(arg.squ_norm());}
+	T norm(const quaternion<T> arg){return sqrt(squ_norm(arg));}
+	/**
+	 * @brief 四元数の標準化をする
+	 * @return もともとの値/それのノルム
+	 */
+	template <typename T>
+	quaternion<T> normalize(quaternion<T> val) {return val/norm(val);}
 }

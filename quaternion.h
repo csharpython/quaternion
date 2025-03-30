@@ -6,6 +6,8 @@
  */
 #pragma once
 #include <cmath>
+#include <type_traits>
+#include <stdexcept>
 namespace qtnion{
 	template <typename T>
 	struct quaternion {
@@ -13,10 +15,11 @@ namespace qtnion{
 		T i;
 		T j;
 		T k;
+		static_assert(std::is_arithmetic<T>::value,"quaternion requires arithmetic type.");
 		/** 
 		 * @brief 四元数を表す構造体。
 		 */
-		quaternion() { one = i = j = k = 0; }
+		quaternion() {one = i = j = k = 0;}
 		quaternion(T one_,T i_ , T j_,T k_) {
 			one = one_;
 			i=i_;
@@ -27,26 +30,14 @@ namespace qtnion{
 		 * @brief 四元数に対する通常の加算
 		 * @param rhs 加数
 		 */
-		quaternion operator+(const quaternion& rhs) const {
-			quaternion ret;
-			ret.one = one + rhs.one;
-			ret.i = i + rhs.i;
-			ret.j = j + rhs.j;
-			ret.k = k + rhs.k;
-			return ret;
-		}
+		inline quaternion operator+(const quaternion& rhs) const
+			{ return {one+rhs.one,i+rhs.i,j+rhs.j,k+rhs.k};}
 		/**
 		 * @brief 四元数に対する通常の減算
 		 * @param rhs 減数
 		 */
-		quaternion operator-(const quaternion& rhs) const {
-			quaternion ret;
-			ret.one = one - rhs.one;
-			ret.i = i - rhs.i;
-			ret.j = j - rhs.j;
-			ret.k = k - rhs.k;
-			return ret;
-		}
+		inline quaternion operator-(const quaternion& rhs) const
+			{return {one-rhs.one,i-rhs.i,j-rhs.j,k-rhs.k};}
 		/**
 		 * @brief 四元数に対する通常の乗算
 		 * @remarks 非可換です。つまり、左辺と右辺を入れ替えると結果が変わ(ることがあ)ります。
@@ -64,41 +55,33 @@ namespace qtnion{
 		 * @brief 四元数の実数による除算
 		 * @param rhs 除数
 		 */
-		quaternion operator/(const T rhs) const {
-			quaternion ret;
-			ret.one = one/rhs;
-			ret.i = i/rhs;
-			ret.j = j/rhs;
-			ret.k = k/rhs;
-			return ret;
+		inline quaternion operator/(const T rhs) const { 
+			if(rhs == 0) throw std::invalid_argument("Cannot divide by 0");
+			return {one/rhs,i/rhs,j/rhs,k/rhs};
 		}
+		inline bool operator==(const quaternion& rhs) const 
+			{ return (one==rhs.one&&i==rhs.i&&j==rhs.j&&k==rhs.k);}
 	};
 	/**
 	 * @brief 四元数に対する共役
 	* @return 四元数の共役
 	*/
 	template <typename T>
-	quaternion<T> conjugate(quaternion<T> val) {
-		quaternion<T> ret;
-		ret.one=val.one;
-		ret.i=-val.i;
-		ret.j=-val.j;
-		ret.k=-val.k;
-		return ret;
-	}
+	inline quaternion<T> conjugate(quaternion<T> val)
+		{ return {val.one,-val.i,-val.j,-val.k};}
 	/**
 	 * @brief 四元数に対するノルムの二乗を計算
 	 * @return 引数のノルムの二乗
 	 */
 	template <typename T>
-	
-	T squ_norm(quaternion<T> val) {return val.one*val.one+val.i*val.i+val.j*val.j+val.k*val.k;}
+	inline T squ_norm(quaternion<T> val)
+		{return val.one*val.one+val.i*val.i+val.j*val.j+val.k*val.k;}
 	/**
 	 * @brief 四元数の逆数を計算
 	 * @return 引数の逆数
 	 */
 	template <typename T>
-	quaternion<T> inverse(quaternion<T> val) {return conjugate(val)/squ_norm(val);}
+	inline quaternion<T> inverse(quaternion<T> val) {return conjugate(val)/squ_norm(val);}
 	/**
 	 * @brief 四元数に対するノルムを計算
 	 * @return 自身のノルム
@@ -106,11 +89,11 @@ namespace qtnion{
 	 * @see squ_norm()
 	 */
 	template <typename T>
-	T norm(const quaternion<T> arg){return sqrt(squ_norm(arg));}
+	inline T norm(const quaternion<T> arg){return sqrt(squ_norm(arg));}
 	/**
 	 * @brief 四元数の標準化をする
-	 * @return もともとの値/それのノルム
+	 * @return もともとの値をそれのノルムで割ったもの
 	 */
 	template <typename T>
-	quaternion<T> normalize(quaternion<T> val) {return val/norm(val);}
+	inline quaternion<T> normalize(quaternion<T> val) {return val/norm(val);}
 }

@@ -19,13 +19,10 @@ namespace qtnion{
 		/** 
 		 * @brief 四元数を表す構造体。
 		 */
-		quaternion() {one = i = j = k = 0;}
-		quaternion(T one_,T i_ , T j_,T k_) {
-			one = one_;
-			i=i_;
-			j=j_;
-			k=k_;
-		}
+		quaternion() {one = i = j = k = 0;}//0
+		quaternion(T one_,T i_=0) { one = one_; i=i_; j = k = 0;}//From ℝ and ℂ
+		quaternion(T i_,T j_,T k_) {one = 0; i = i_; j=j_; k=k_;}//From 3D vector
+		quaternion(T one_,T i_ , T j_,T k_) { one = one_; i=i_; j=j_; k=k_;}//From ℍ
 		/**
 		 * @brief 四元数に対する通常の加算
 		 * @param rhs 加数
@@ -96,4 +93,18 @@ namespace qtnion{
 	 */
 	template <typename T>
 	inline quaternion<T> normalize(quaternion<T> val) {return val/norm(val);}
+	/**
+	 * @brief 四元数を3次元空間での回転から作る
+	 * @attention 与えられる空間ベクトルは正規化済みであることを前提とする。
+	 * @return 回転軸と回転角度から求められる四元数
+	 */
+	template <typename T>
+	inline quaternion<T> polarturn(T x,T y,T z,T theta){
+		return {cos(theta/2),x*sin(theta/2),y*sin(theta/2),z*sin(theta/2)};}
+	/**
+	 * @brief 空間ベクトルを四元数に基づいて回転させる
+	 * @return 空間ベクトルを回転させたものを表す四元数
+	 */
+	template <typename T>
+	inline quaternion<T> turn3Dvec(quaternion<T> v,quaternion<T> q){return q*v*conjugate(q);}
 }
